@@ -37,3 +37,4 @@
 2026-01-31T08:12:12  test: add edge case
 2026-05-24T15:29:19  refactor: tidy internals
 2024-06-03T14:10:50  test: trust, but verify
+2024-06-30T09:27:57  ci(ci): tune severity weights
