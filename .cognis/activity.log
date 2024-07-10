@@ -38,3 +38,4 @@
 2026-05-24T15:29:19  refactor: tidy internals
 2024-06-03T14:10:50  test: trust, but verify
 2024-06-30T09:27:57  ci(ci): tune severity weights
+2024-07-10T16:44:04  fix(scoring): simplify the walker
