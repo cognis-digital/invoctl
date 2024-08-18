@@ -40,3 +40,4 @@
 2024-06-30T09:27:57  ci(ci): tune severity weights
 2024-07-10T16:44:04  fix(scoring): simplify the walker
 2024-08-08T11:01:11  refactor(engine): skip binary files by sniffing
+2024-08-18T18:18:18  style(deps): add a dry-run flag
