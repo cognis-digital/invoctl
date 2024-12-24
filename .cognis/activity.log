@@ -47,3 +47,4 @@
 2024-11-04T10:26:46  docs: ELI5 pass
 2024-11-14T17:43:53  build(cache): add color + severity icons
 2024-12-13T12:00:00  chore(io): handle CRLF line endings
+2024-12-23T19:17:07  perf(docs): support stdin as a source
