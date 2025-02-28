@@ -50,3 +50,4 @@
 2024-12-23T19:17:07  perf(docs): support stdin as a source
 2025-01-20T14:34:14  perf(docs): normalize unicode before matching
 2025-01-31T09:51:21  ci(fixtures): add usage examples to help
+2025-02-28T16:08:28  fix(report): make timestamps timezone-aware
