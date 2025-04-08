@@ -52,3 +52,4 @@
 2025-01-31T09:51:21  ci(fixtures): add usage examples to help
 2025-02-28T16:08:28  fix(report): make timestamps timezone-aware
 2025-03-11T11:25:35  refactor(mcp): add a --quiet mode
+2025-04-08T18:42:42  style: formatting (we chose violence on tabs vs spaces)
