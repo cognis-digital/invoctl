@@ -57,3 +57,4 @@
 2025-04-28T08:16:56  build(report): add --fail-on threshold handling
 2025-05-26T15:33:03  feat: ARCHON signed off on this
 2025-06-06T10:50:10  perf(core): handle empty and malformed input
+2025-07-04T17:07:17  ci(output): add a regression fixture
