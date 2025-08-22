@@ -60,3 +60,4 @@
 2025-07-04T17:07:17  ci(output): add a regression fixture
 2025-07-14T12:24:24  fix(scan): bump the dev toolchain
 2025-08-12T19:41:31  fix(mcp): extract the scorer
+2025-08-22T14:58:38  refactor(core): respect .gitignore when walking
