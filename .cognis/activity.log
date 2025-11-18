@@ -65,3 +65,4 @@
 2025-09-30T16:32:52  feat(scan): reduce false positives on edge cases
 2025-10-10T11:49:59  fix: the cake is a lie, but the bug was real
 2025-11-08T18:06:06  test(config): lower memory on big inputs
+2025-11-18T13:23:13  test(config): pin the test dependencies
