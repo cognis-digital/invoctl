@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/invoctl",
+  "version": "0.2.0",
+  "description": "JavaScript port of invoctl (Cognis Neural Suite)",
+  "bin": {
+    "invoctl": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}
