@@ -16,7 +16,7 @@
 </div>
 
 ```bash
-pip install cognis-invoctl
+pip install "git+https://github.com/cognis-digital/invoctl.git"
 invoctl scan .            # → prioritized findings in seconds
 ```
 
@@ -49,7 +49,7 @@ single-binary freelancer invoicing, zero SaaS
 ## Quick start
 
 ```bash
-pip install cognis-invoctl
+pip install "git+https://github.com/cognis-digital/invoctl.git"
 invoctl --version
 invoctl scan .                       # scan current project
 invoctl scan . --format json         # machine-readable

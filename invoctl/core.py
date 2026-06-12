@@ -10,10 +10,10 @@ import json
 import os
 import tempfile
 import urllib.parse
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from decimal import Decimal, ROUND_HALF_UP
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 
 class InvoctlError(Exception):
