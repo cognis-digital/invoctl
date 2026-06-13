@@ -22,32 +22,43 @@ invoctl scan .            # → prioritized findings in seconds
 
 ## Usage — step by step
 
-`invoctl` is a ledger-backed CLI invoicer. State lives in a JSON ledger
-(`--ledger`, default `invoctl_ledger.json`); every subcommand reads/writes it.
+1. **Install:**
 
-```bash
-# 1. Install
-pip install -e .
+   ```bash
+   pip install invoctl
+   ```
 
-# 2. Create an invoice (--item is "desc x qty @ price", repeatable)
-invoctl create --number INV-001 --client "Acme Co" \
-  --item "Consulting x 10 @ 150" --tax-rate 8.25 --due-days 30
+2. **Create an invoice** — line items are `Description:qty:unit_price`, repeat `--item` per line:
 
-# 3. Inspect what you have
-invoctl show INV-001
-invoctl list
-invoctl summary --format json     # outstanding vs collected, machine-readable
+   ```bash
+   invoctl create --number INV-1001 --client "Acme Corp" \
+     --item "Design work:10:120" --item "Hosting:1:45" \
+     --tax-rate 8.25 --due-days 30
+   ```
 
-# 4. Generate a payment link and mark it paid once collected
-invoctl pay-link INV-001
-invoctl status INV-001 paid
+   Invoices persist to a ledger (default `invoctl_ledger.json`; override with `--ledger`).
 
-# 5. Automation — render a PDF per invoice in a billing job
-for n in $(invoctl list --format json | jq -r '.[].number'); do
-  invoctl pdf "$n" --out "invoices/$n.pdf"
-done
-```
+3. **Inspect the ledger** — list, show, or summarize:
 
+   ```bash
+   invoctl list
+   invoctl show INV-1001
+   invoctl summary          # outstanding vs collected
+   ```
+
+4. **Generate a payment link and a PDF**, then mark it sent/paid:
+
+   ```bash
+   invoctl pay-link INV-1001
+   invoctl pdf INV-1001 --out INV-1001.pdf
+   invoctl status INV-1001 paid
+   ```
+
+5. **Automation** — drive it from scripts with machine-readable output:
+
+   ```bash
+   invoctl --format json show INV-1001 | jq '.total'
+   ```
 
 ## Contents
 
