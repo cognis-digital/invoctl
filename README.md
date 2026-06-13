@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/invoctl.git"
 invoctl scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+invoctl is a command-line tool that lets freelancers and small businesses create professional invoices, generate payment links, and keep a local record of what has been paid — all without signing up for any online service. You run it from a terminal, give it your client name and line items, and it produces a formatted invoice as text or a PDF file ready to send. Your invoice data is stored as a simple JSON file on your own computer, so nothing is uploaded to a third-party server. It is built for developers and technical founders who want billing to be scriptable and private rather than locked inside a SaaS dashboard.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why invoctl?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -46,6 +52,42 @@ single-binary freelancer invoicing, zero SaaS
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`invoctl` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/invoctl/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/invoctl/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/invoctl.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/invoctl.git"  # uv
+pip install "git+https://github.com/cognis-digital/invoctl.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/invoctl.git
+cd invoctl && pip install .
+```
+
+Then run:
+```sh
+invoctl --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
