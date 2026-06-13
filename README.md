@@ -20,6 +20,35 @@ pip install cognis-invoctl
 invoctl scan .            # → prioritized findings in seconds
 ```
 
+## Usage — step by step
+
+`invoctl` is a ledger-backed CLI invoicer. State lives in a JSON ledger
+(`--ledger`, default `invoctl_ledger.json`); every subcommand reads/writes it.
+
+```bash
+# 1. Install
+pip install -e .
+
+# 2. Create an invoice (--item is "desc x qty @ price", repeatable)
+invoctl create --number INV-001 --client "Acme Co" \
+  --item "Consulting x 10 @ 150" --tax-rate 8.25 --due-days 30
+
+# 3. Inspect what you have
+invoctl show INV-001
+invoctl list
+invoctl summary --format json     # outstanding vs collected, machine-readable
+
+# 4. Generate a payment link and mark it paid once collected
+invoctl pay-link INV-001
+invoctl status INV-001 paid
+
+# 5. Automation — render a PDF per invoice in a billing job
+for n in $(invoctl list --format json | jq -r '.[].number'); do
+  invoctl pdf "$n" --out "invoices/$n.pdf"
+done
+```
+
+
 ## Contents
 
 - [Why invoctl?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
