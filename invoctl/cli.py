@@ -12,7 +12,6 @@ from invoctl.core import (
     LineItem,
     Ledger,
     InvoctlError,
-    compute_totals,
     payment_link,
     render_pdf,
     render_text,
