@@ -34,3 +34,6 @@ invoctl = "invoctl.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["invoctl"]
+
+[tool.hatch.metadata]
+allow-direct-references = true
