@@ -63,11 +63,16 @@ class LineItem:
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "LineItem":
-        return cls(
-            description=d["description"],
-            quantity=d["quantity"],
-            unit_price=d["unit_price"],
-        )
+        try:
+            return cls(
+                description=d["description"],
+                quantity=d["quantity"],
+                unit_price=d["unit_price"],
+            )
+        except KeyError as exc:
+            raise InvoctlError(
+                f"line item missing required field: {exc}"
+            ) from exc
 
 
 @dataclass
@@ -84,24 +89,36 @@ class Invoice:
     status: str = "draft"  # draft | sent | paid
 
     def __post_init__(self) -> None:
-        if not self.number:
+        if not self.number or not str(self.number).strip():
             raise InvoctlError("invoice number is required")
-        if not self.client:
+        if not self.client or not str(self.client).strip():
             raise InvoctlError("client is required")
         if not self.items:
             raise InvoctlError("invoice needs at least one line item")
-        self.tax_rate = Decimal(str(self.tax_rate))
+        if self.due_days < 0:
+            raise InvoctlError("due_days must be >= 0")
+        try:
+            self.tax_rate = Decimal(str(self.tax_rate))
+        except Exception as exc:  # noqa: BLE001
+            raise InvoctlError(
+                f"invalid tax_rate: {self.tax_rate!r}"
+            ) from exc
         self.discount = _money(self.discount)
         if self.tax_rate < 0:
             raise InvoctlError("tax_rate must be >= 0")
         if self.discount < 0:
             raise InvoctlError("discount must be >= 0")
         if self.status not in ("draft", "sent", "paid"):
-            raise InvoctlError(f"invalid status: {self.status}")
+            raise InvoctlError(f"invalid status: {self.status!r}")
 
     @property
     def due(self) -> str:
-        issued = datetime.strptime(self.issued, "%Y-%m-%d").date()
+        try:
+            issued = datetime.strptime(self.issued, "%Y-%m-%d").date()
+        except (ValueError, TypeError) as exc:
+            raise InvoctlError(
+                f"invalid issued date {self.issued!r}; expected YYYY-MM-DD"
+            ) from exc
         return (issued + timedelta(days=self.due_days)).isoformat()
 
     def to_dict(self) -> Dict[str, Any]:
@@ -123,18 +140,23 @@ class Invoice:
 
     @classmethod
     def from_dict(cls, d: Dict[str, Any]) -> "Invoice":
-        return cls(
-            number=d["number"],
-            client=d["client"],
-            items=[LineItem.from_dict(i) for i in d["items"]],
-            currency=d.get("currency", "USD"),
-            tax_rate=d.get("tax_rate", 0),
-            discount=d.get("discount", 0),
-            issued=d.get("issued", date.today().isoformat()),
-            due_days=d.get("due_days", 30),
-            notes=d.get("notes", ""),
-            status=d.get("status", "draft"),
-        )
+        try:
+            return cls(
+                number=d["number"],
+                client=d["client"],
+                items=[LineItem.from_dict(i) for i in d["items"]],
+                currency=d.get("currency", "USD"),
+                tax_rate=d.get("tax_rate", 0),
+                discount=d.get("discount", 0),
+                issued=d.get("issued", date.today().isoformat()),
+                due_days=d.get("due_days", 30),
+                notes=d.get("notes", ""),
+                status=d.get("status", "draft"),
+            )
+        except KeyError as exc:
+            raise InvoctlError(
+                f"invoice record missing required field: {exc}"
+            ) from exc
 
 
 def compute_totals(inv: Invoice) -> Dict[str, float]:
@@ -152,12 +174,20 @@ def compute_totals(inv: Invoice) -> Dict[str, float]:
     }
 
 
-def payment_link(inv: Invoice, base_url: str = "https://pay.invoctl.local/checkout") -> str:
+_DEFAULT_BASE_URL = "https://pay.invoctl.local/checkout"
+
+
+def payment_link(
+    inv: Invoice,
+    base_url: str = _DEFAULT_BASE_URL,
+) -> str:
     """Build a deterministic, shareable payment URL with query params.
 
     No network call; this encodes the invoice into a checkout URL that a
     payment processor endpoint could consume.
     """
+    if not base_url or not base_url.strip():
+        raise InvoctlError("base_url must not be empty")
     totals = compute_totals(inv)
     params = {
         "invoice": inv.number,
@@ -188,7 +218,8 @@ def render_text(inv: Invoice) -> str:
     lines.append(f"{'Subtotal':>46}{t['subtotal']:>10.2f}")
     if t["discount_applied"]:
         lines.append(f"{'Discount':>46}{-t['discount_applied']:>10.2f}")
-    lines.append(f"{'Tax (' + format(_f(inv.tax_rate), 'g') + '%)':>46}{t['tax']:>10.2f}")
+    tax_label = f"Tax ({format(_f(inv.tax_rate), 'g')}%)"
+    lines.append(f"{tax_label:>46}{t['tax']:>10.2f}")
     lines.append(f"{'TOTAL ' + inv.currency:>46}{t['total']:>10.2f}")
     if inv.notes:
         lines.append("")
@@ -249,8 +280,11 @@ def render_pdf(inv: Invoice, path: str) -> str:
         "%%EOF\n"
     ).encode()
 
-    with open(path, "wb") as fh:
-        fh.write(bytes(out))
+    try:
+        with open(path, "wb") as fh:
+            fh.write(bytes(out))
+    except OSError as exc:
+        raise InvoctlError(f"cannot write PDF to {path!r}: {exc}") from exc
     return path
 
 
@@ -274,15 +308,30 @@ class Ledger:
     def _save(self) -> None:
         payload = {"invoices": self._data}
         d = os.path.dirname(os.path.abspath(self.path))
-        os.makedirs(d, exist_ok=True)
-        fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        try:
+            os.makedirs(d, exist_ok=True)
+            fd, tmp = tempfile.mkstemp(dir=d, suffix=".tmp")
+        except OSError as exc:
+            raise InvoctlError(
+                f"cannot write ledger at {self.path!r}: {exc}"
+            ) from exc
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as fh:
                 json.dump(payload, fh, indent=2, sort_keys=True)
             os.replace(tmp, self.path)
-        except BaseException:
-            if os.path.exists(tmp):
+        except OSError as exc:
+            try:
                 os.remove(tmp)
+            except OSError:
+                pass
+            raise InvoctlError(
+                f"cannot save ledger at {self.path!r}: {exc}"
+            ) from exc
+        except BaseException:
+            try:
+                os.remove(tmp)
+            except OSError:
+                pass
             raise
 
     def add(self, inv: Invoice) -> Invoice:

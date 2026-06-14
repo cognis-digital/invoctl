@@ -52,7 +52,10 @@ def _emit(obj: Any, fmt: str) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(prog=TOOL_NAME, description="CLI invoicing + payment links")
+    p = argparse.ArgumentParser(
+        prog=TOOL_NAME,
+        description="CLI invoicing + payment links",
+    )
     p.add_argument("--version", action="version", version=f"{TOOL_NAME} {TOOL_VERSION}")
     p.add_argument("--ledger", default="invoctl_ledger.json", help="ledger JSON path")
     p.add_argument("--format", choices=["table", "json"], default="table")
@@ -99,6 +102,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         ledger = Ledger(args.ledger)
 
         if args.command == "create":
+            if args.due_days < 0:
+                print(
+                    "error: --due-days must be >= 0",
+                    file=sys.stderr,
+                )
+                return 2
             items = [_parse_item(s) for s in args.item]
             inv = Invoice(
                 number=args.number,
@@ -126,23 +135,40 @@ def main(argv: Optional[List[str]] = None) -> int:
         elif args.command == "pay-link":
             inv = ledger.get(args.number)
             link = payment_link(inv, args.base_url)
-            _emit({"invoice": inv.number, "payment_link": link} if fmt == "json" else link, fmt)
+            _emit(
+                {"invoice": inv.number, "payment_link": link}
+                if fmt == "json"
+                else link,
+                fmt,
+            )
 
         elif args.command == "pdf":
             inv = ledger.get(args.number)
             out = render_pdf(inv, args.out)
-            _emit({"invoice": inv.number, "pdf": out} if fmt == "json" else f"wrote {out}", fmt)
+            _emit(
+                {"invoice": inv.number, "pdf": out}
+                if fmt == "json"
+                else f"wrote {out}",
+                fmt,
+            )
 
         elif args.command == "status":
             inv = ledger.set_status(args.number, args.value)
-            _emit({"invoice": inv.number, "status": inv.status} if fmt == "json"
-                  else f"{inv.number} -> {inv.status}", fmt)
+            _emit(
+                {"invoice": inv.number, "status": inv.status}
+                if fmt == "json"
+                else f"{inv.number} -> {inv.status}",
+                fmt,
+            )
 
         else:  # pragma: no cover - argparse enforces this
             parser.error("unknown command")
             return 2
 
     except InvoctlError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 1
+    except OSError as exc:  # unexpected I/O error (permissions, full disk, etc.)
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
