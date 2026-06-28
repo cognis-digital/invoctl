@@ -1,0 +1,22 @@
+$ invoctl-emit --help
+
+usage: invoctl [-h] [--version] [--ledger LEDGER] [--format {table,json}]
+               {create,show,list,summary,pay-link,pdf,status} ...
+
+CLI invoicing + payment links
+
+positional arguments:
+  {create,show,list,summary,pay-link,pdf,status}
+    create              create a new invoice
+    show                show an invoice
+    list                list all invoices
+    summary             ledger summary (outstanding/collected)
+    pay-link            generate a payment link
+    pdf                 render invoice to PDF
+    status              set invoice status
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --ledger LEDGER       ledger JSON path
+  --format {table,json}

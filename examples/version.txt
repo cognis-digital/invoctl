@@ -1,0 +1,3 @@
+$ invoctl-emit --version
+
+invoctl 1.0.0

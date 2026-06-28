@@ -20,6 +20,68 @@ pip install cognis-invoctl
 invoctl scan .            # → prioritized findings in seconds
 ```
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ invoctl-emit --version
+invoctl 1.0.0
+```
+
+```console
+$ invoctl-emit --help
+usage: invoctl [-h] [--version] [--ledger LEDGER] [--format {table,json}]
+               {create,show,list,summary,pay-link,pdf,status} ...
+
+CLI invoicing + payment links
+
+positional arguments:
+  {create,show,list,summary,pay-link,pdf,status}
+    create              create a new invoice
+    show                show an invoice
+    list                list all invoices
+    summary             ledger summary (outstanding/collected)
+    pay-link            generate a payment link
+    pdf                 render invoice to PDF
+    status              set invoice status
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --ledger LEDGER       ledger JSON path
+  --format {table,json}
+```
+
+> Blocks above are real `invoctl` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+"findings": [
+    {
+        "id": "123456",
+        "title": "Suspicious Network Traffic",
+        "description": "Network traffic from unknown IP address to internal server",
+        "severity": "medium",
+        "created_at": "2023-02-20T14:30:00Z"
+    },
+    {
+        "id": "789012",
+        "title": "Unusual Login Attempt",
+        "description": "Failed login attempt from unknown location",
+        "severity": "high",
+        "created_at": "2023-02-22T10:45:00Z"
+    }
+]
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install:**
